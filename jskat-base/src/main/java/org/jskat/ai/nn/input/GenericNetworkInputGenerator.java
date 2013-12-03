@@ -36,11 +36,12 @@ public class GenericNetworkInputGenerator implements NetworkInputGenerator {
 		strategies.add(new PlayerPartyMadeCardsAndNextCardStrategy());
 		strategies.add(new OpponentPartyMadeCardsAndNextCardStrategy());
 		strategies.add(new UnplayedCardsForPlayerAndNextCardInputStrategy());
-		strategies.add(new TrickCardAndNextCardInputStrategy());
+		// strategies.add(new TrickCardAndNextCardInputStrategy());
 	}
 
 	@Override
-	public double[] getNetInputs(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetInputs(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = new double[getNeuronCountForAllStrategies()];
 		int index = 0;

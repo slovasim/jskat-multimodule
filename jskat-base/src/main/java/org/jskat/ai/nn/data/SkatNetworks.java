@@ -175,13 +175,6 @@ public class SkatNetworks {
 	 */
 	public static void resetNeuralNetworks() {
 
-		for (Map<PlayerParty, List<INeuralNetwork>> gameTypeNets : networks
-				.values()) {
-			for (List<INeuralNetwork> playerPartyNets : gameTypeNets.values()) {
-				for (INeuralNetwork net : playerPartyNets) {
-					net.resetNetwork();
-				}
-			}
-		}
+		createNetworks();
 	}
 }

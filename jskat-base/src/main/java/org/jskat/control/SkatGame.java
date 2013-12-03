@@ -287,11 +287,13 @@ public class SkatGame extends JSkatThread {
 	 */
 	public void dealCards() {
 
+		// deck = new CardDeck(
+		// "CJ SJ HJ CK CQ SK C7 C8 S7 H7 D7 DJ CA CT C9 SQ HA HK HQ S8 H8 H9 HT SA ST S9 D8 D9 DT DA DK DQ");
 		if (deck == null) {
 			// Skat game has no cards, yet
 			deck = new CardDeck();
-			log.debug("shuffling..."); //$NON-NLS-1$
 
+			log.debug("shuffling..."); //$NON-NLS-1$
 			deck.shuffle();
 			log.debug(deck.toString());
 		}
