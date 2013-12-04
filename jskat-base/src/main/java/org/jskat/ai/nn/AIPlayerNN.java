@@ -345,18 +345,18 @@ public class AIPlayerNN extends AbstractAIPlayer
             }
         }
 
-        if (bestCards.size() > 0)
-        {
-            // get random card out of the best cards
-            bestCardIndex = chooseRandomCard(possibleCards, bestCards);
-            log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": Found best cards. Choosing random from " + bestCards.size() + " out of " + possibleCards.size() + ": " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        }
-        else
-        {
-            // no best card, get card with best output
-            bestCardIndex = chooseRandomCard(possibleCards, highestOutputCards);
-            log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": No best cards. Choosing card with highest output: " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$
-        }
+        // if (bestCards.size() > 0)
+        // {
+        // // get random card out of the best cards
+        // bestCardIndex = chooseRandomCard(possibleCards, bestCards);
+        //            log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": Found best cards. Choosing random from " + bestCards.size() + " out of " + possibleCards.size() + ": " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+        // }
+        // else
+        // {
+        // no best card, get card with best output
+        bestCardIndex = chooseRandomCard(possibleCards, highestOutputCards);
+        log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": No best cards. Choosing card with highest output: " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$
+        // }
         // } else {
         // // no best card, get random card out of all cards
         // bestCardIndex = chooseRandomCard(possibleCards, possibleCards);
