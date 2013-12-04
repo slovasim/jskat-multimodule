@@ -73,6 +73,15 @@ public class NNTrainer extends JSkatThread {
 	}
 
 	/**
+	 * @see java.lang.Thread#run()
+	 */
+	@Override
+	public void run() {
+
+		trainNets();
+	}
+
+	/**
 	 * Sets the game type to learn
 	 * 
 	 * @param newGameType
@@ -85,15 +94,6 @@ public class NNTrainer extends JSkatThread {
 	}
 
 	/**
-	 * @see java.lang.Thread#run()
-	 */
-	@Override
-	public void run() {
-
-		trainNets();
-	}
-
-	/**
 	 * Stops the training
 	 * 
 	 * @param isStopTraining
@@ -101,6 +101,88 @@ public class NNTrainer extends JSkatThread {
 	 */
 	public void stopTraining(boolean isStopTraining) {
 		stopTraining = isStopTraining;
+	}
+
+	private JSkatPlayer createPlayer(String playerType) {
+
+		JSkatPlayer player = JSkatMaster.instance().createPlayer(playerType);
+
+		if (NEURAL_NETWORK_PLAYER_CLASS.equals(playerType)) {
+			AIPlayerNN nnPlayer = (AIPlayerNN) player;
+			nnPlayer.setIsLearning(true);
+			nnPlayer.setLogger(NOPLogger.NOP_LOGGER);
+		}
+
+		return player;
+	}
+
+	private CardDeck getPerfectDistribution() {
+		return new CardDeck(
+				"CJ SJ HJ CK CQ SK C7 C8 S7 H7 D7 DJ CA CT C9 SQ HA HK HQ S8 H8 H9 HT SA ST S9 D8 D9 DT DA DK DQ");
+	}
+
+	private boolean isGameWon(final Player currPlayer, final SkatGame game) {
+
+		// FIXME (jansch 28.06.2011) have to call getGameResult() to get
+		// the result
+		game.getGameResult();
+
+		boolean gameWon = false;
+		if (gameType.equals(GameType.RAMSCH)) {
+			gameWon = isRamschGameWon(game.getGameSummary(), currPlayer);
+		} else {
+			gameWon = game.isGameWon();
+		}
+		return gameWon;
+	}
+
+	private SkatGame prepareGame(final JSkatPlayer player1,
+			final JSkatPlayer player2, final JSkatPlayer player3,
+			final Player declarer, final CardDeck cardDeck) {
+		player1.newGame(Player.FOREHAND);
+		player2.newGame(Player.MIDDLEHAND);
+		player3.newGame(Player.REARHAND);
+		SkatGame game = new SkatGame("table", GameVariant.STANDARD, player1,
+				player2, player3);
+		game.setView(new NullView());
+		game.setLogger(NOPLogger.NOP_LOGGER);
+
+		if (cardDeck != null) {
+			game.setCardDeck(cardDeck);
+		} else {
+			CardDeck newCardDeck = new CardDeck();
+			newCardDeck.shuffle();
+			log.debug("Card deck: " + newCardDeck); //$NON-NLS-1$
+			game.setCardDeck(newCardDeck);
+		}
+
+		game.dealCards();
+
+		if (!GameType.RAMSCH.equals(gameType)) {
+			game.setDeclarer(declarer);
+		}
+
+		GameAnnouncementFactory factory = GameAnnouncement.getFactory();
+		factory.setGameType(gameType);
+		GameAnnouncement announcement = factory.getAnnouncement();
+		game.setGameAnnouncement(announcement);
+
+		player1.startGame(declarer, announcement);
+		player2.startGame(declarer, announcement);
+		player3.startGame(declarer, announcement);
+
+		game.setGameState(GameState.TRICK_PLAYING);
+		return game;
+	}
+
+	private void runGame(final SkatGame game) {
+		game.start();
+		try {
+			game.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -117,7 +199,7 @@ public class NNTrainer extends JSkatThread {
 
 		List<String> playerTypes = new ArrayList<String>();
 		playerTypes.add(NEURAL_NETWORK_PLAYER_CLASS);
-		playerTypes.add(RANDOM_PLAYER_CLASS);
+//		playerTypes.add(RANDOM_PLAYER_CLASS);
 		Set<List<String>> playerPermutations = createPlayerPermutations(playerTypes);
 
 		while (!stopTraining) {
@@ -199,88 +281,6 @@ public class NNTrainer extends JSkatThread {
 
 			checkWaitCondition();
 		}
-	}
-
-	private CardDeck getPerfectDistribution() {
-		return new CardDeck(
-				"CJ SJ HJ CK CQ SK C7 C8 S7 H7 D7 DJ CA CT C9 SQ HA HK HQ S8 H8 H9 HT SA ST S9 D8 D9 DT DA DK DQ");
-	}
-
-	private JSkatPlayer createPlayer(String playerType) {
-
-		JSkatPlayer player = JSkatMaster.instance().createPlayer(playerType);
-
-		if (NEURAL_NETWORK_PLAYER_CLASS.equals(playerType)) {
-			AIPlayerNN nnPlayer = (AIPlayerNN) player;
-			nnPlayer.setIsLearning(true);
-			nnPlayer.setLogger(NOPLogger.NOP_LOGGER);
-		}
-
-		return player;
-	}
-
-	private boolean isGameWon(final Player currPlayer, final SkatGame game) {
-
-		// FIXME (jansch 28.06.2011) have to call getGameResult() to get
-		// the result
-		game.getGameResult();
-
-		boolean gameWon = false;
-		if (gameType.equals(GameType.RAMSCH)) {
-			gameWon = isRamschGameWon(game.getGameSummary(), currPlayer);
-		} else {
-			gameWon = game.isGameWon();
-		}
-		return gameWon;
-	}
-
-	private void runGame(final SkatGame game) {
-		game.start();
-		try {
-			game.join();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private SkatGame prepareGame(final JSkatPlayer player1,
-			final JSkatPlayer player2, final JSkatPlayer player3,
-			final Player declarer, final CardDeck cardDeck) {
-		player1.newGame(Player.FOREHAND);
-		player2.newGame(Player.MIDDLEHAND);
-		player3.newGame(Player.REARHAND);
-		SkatGame game = new SkatGame("table", GameVariant.STANDARD, player1,
-				player2, player3);
-		game.setView(new NullView());
-		game.setLogger(NOPLogger.NOP_LOGGER);
-
-		if (cardDeck != null) {
-			game.setCardDeck(cardDeck);
-		} else {
-			CardDeck newCardDeck = new CardDeck();
-			newCardDeck.shuffle();
-			log.debug("Card deck: " + newCardDeck); //$NON-NLS-1$
-			game.setCardDeck(newCardDeck);
-		}
-
-		game.dealCards();
-
-		if (!GameType.RAMSCH.equals(gameType)) {
-			game.setDeclarer(declarer);
-		}
-
-		GameAnnouncementFactory factory = GameAnnouncement.getFactory();
-		factory.setGameType(gameType);
-		GameAnnouncement announcement = factory.getAnnouncement();
-		game.setGameAnnouncement(announcement);
-
-		player1.startGame(declarer, announcement);
-		player2.startGame(declarer, announcement);
-		player3.startGame(declarer, announcement);
-
-		game.setGameState(GameState.TRICK_PLAYING);
-		return game;
 	}
 
 	static Set<List<String>> createPlayerPermutations(List<String> playerTypes) {
