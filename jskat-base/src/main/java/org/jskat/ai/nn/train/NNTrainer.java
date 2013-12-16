@@ -194,7 +194,7 @@ public class NNTrainer extends JSkatThread {
 
 		List<String> playerTypes = new ArrayList<String>();
 		playerTypes.add(NEURAL_NETWORK_PLAYER_CLASS);
-//		playerTypes.add(RANDOM_PLAYER_CLASS);
+        // playerTypes.add(RANDOM_PLAYER_CLASS);
 		Set<List<String>> playerPermutations = createPlayerPermutations(playerTypes);
 
 		while (!stopTraining) {

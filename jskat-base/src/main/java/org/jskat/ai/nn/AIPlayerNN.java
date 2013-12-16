@@ -49,7 +49,7 @@ public class AIPlayerNN extends AbstractAIPlayer
 {
 
     private final static Long     MAX_SIMULATIONS            = 100L;
-    private final static Double   MIN_WON_RATE_FOR_BIDDING   = 0.5;
+    private final static Double   MIN_WON_RATE_FOR_BIDDING   = 0.6;
     private final static Double   MIN_WON_RATE_FOR_HAND_GAME = 0.95;
 
     public final static Double    IDEAL_WON                  = 1.0;

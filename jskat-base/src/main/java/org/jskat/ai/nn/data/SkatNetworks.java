@@ -37,12 +37,12 @@ public class SkatNetworks {
 
 	private static int INPUT_NEURONS = GenericNetworkInputGenerator
 			.getNeuronCountForAllStrategies();
-	private static int HIDDEN_NEURONS = 5;
+    private static int                                                   HIDDEN_NEURONS = 50;
 	private static int OUTPUT_NEURONS = 1;
 
 	private static final boolean USE_BIAS = true;
 
-	private final static SkatNetworks INTSTANCE = new SkatNetworks();
+	private final static SkatNetworks INSTANCE = new SkatNetworks();
 
 	private static Map<GameType, Map<PlayerParty, List<INeuralNetwork>>> networks;
 
@@ -87,7 +87,7 @@ public class SkatNetworks {
 	 */
 	public static SkatNetworks instance() {
 
-		return INTSTANCE;
+		return INSTANCE;
 	}
 
 	/**
