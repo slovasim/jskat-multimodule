@@ -46,8 +46,10 @@ public class NNTrainer extends JSkatThread {
 
 	private static Logger log = LoggerFactory.getLogger(NNTrainer.class);
 
-	final static String NEURAL_NETWORK_PLAYER_CLASS = "org.jskat.ai.nn.AIPlayerNN";
-	final static String RANDOM_PLAYER_CLASS = "org.jskat.ai.rnd.AIPlayerRND";
+	private static final Integer MAX_TRAINING_EPISODES = 1000000;
+
+	static final String NEURAL_NETWORK_PLAYER_CLASS = "org.jskat.ai.nn.AIPlayerNN";
+	static final String RANDOM_PLAYER_CLASS = "org.jskat.ai.rnd.AIPlayerRND";
 
 	private final JSkatMaster jskat;
 
@@ -194,10 +196,10 @@ public class NNTrainer extends JSkatThread {
 
 		List<String> playerTypes = new ArrayList<String>();
 		playerTypes.add(NEURAL_NETWORK_PLAYER_CLASS);
-        // playerTypes.add(RANDOM_PLAYER_CLASS);
+		// playerTypes.add(RANDOM_PLAYER_CLASS);
 		Set<List<String>> playerPermutations = createPlayerPermutations(playerTypes);
 
-		while (!stopTraining) {
+		while (!stopTraining && totalGames < MAX_TRAINING_EPISODES) {
 
 			if (totalGames > 0) {
 				if (opponentParticipations == 0) {

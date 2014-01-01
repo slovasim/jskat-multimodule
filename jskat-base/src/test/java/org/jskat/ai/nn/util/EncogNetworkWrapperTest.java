@@ -43,7 +43,7 @@ public class EncogNetworkWrapperTest extends AbstractJSkatTest {
 	/**
 	 * Maximum iterations for network learning
 	 */
-	private static final int MAX_ITERATIONS = 500;
+	private static final int MAX_ITERATIONS = 5000;
 	/**
 	 * Logger.
 	 */
@@ -71,8 +71,7 @@ public class EncogNetworkWrapperTest extends AbstractJSkatTest {
 		int iteration = 0;
 
 		while (error > MIN_DIFF && iteration < MAX_ITERATIONS) {
-			network.adjustWeights(input[i], output[i]);
-			error = network.getAvgDiff();
+			error = network.adjustWeights(input[i], output[i]);
 			i = (i + 1) % input.length;
 			iteration++;
 		}
