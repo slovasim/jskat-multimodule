@@ -37,7 +37,7 @@ public class SkatNetworks {
 
 	private static int INPUT_NEURONS = GenericNetworkInputGenerator
 			.getNeuronCountForAllStrategies();
-	private static int HIDDEN_NEURONS = 50;
+	private static int HIDDEN_NEURONS = 100;
 	private static int OUTPUT_NEURONS = 1;
 
 	private static final boolean USE_BIAS = true;
@@ -135,20 +135,25 @@ public class SkatNetworks {
 	public static void saveNetworks(final String path) {
 		for (Entry<GameType, Map<PlayerParty, List<INeuralNetwork>>> gameTypeNets : networks
 				.entrySet()) {
-			for (Entry<PlayerParty, List<INeuralNetwork>> playerPartyNet : gameTypeNets
-					.getValue().entrySet()) {
-				for (int i = 0; i < 10; i++) {
-					playerPartyNet
-							.getValue()
-							.get(i)
-							.saveNetwork(
-									path.concat("jskat")
-											.concat("." + gameTypeNets.getKey())
-											.concat("."
-													+ playerPartyNet.getKey())
-											.concat(".TRICK" + i)
-											.concat(".nnet"));
-				}
+			saveNetworks(path, gameTypeNets.getKey());
+		}
+	}
+
+	public static void saveNetworks(final String path, GameType gameType) {
+
+		Map<PlayerParty, List<INeuralNetwork>> gameTypeNetworks = networks
+				.get(gameType);
+
+		for (Entry<PlayerParty, List<INeuralNetwork>> playerPartyNet : gameTypeNetworks
+				.entrySet()) {
+			for (int i = 0; i < 10; i++) {
+				playerPartyNet
+						.getValue()
+						.get(i)
+						.saveNetwork(
+								path.concat("jskat").concat("." + gameType)
+										.concat("." + playerPartyNet.getKey())
+										.concat(".TRICK" + i).concat(".nnet"));
 			}
 		}
 	}
