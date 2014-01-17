@@ -40,13 +40,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.NOPLogger;
 
 /**
- * Trains the neural networks
+ * Trains the neural networks.
  */
 public class NNTrainer extends JSkatThread {
 
 	private static Logger log = LoggerFactory.getLogger(NNTrainer.class);
 
 	private static final Integer MAX_TRAINING_EPISODES = 1000000;
+	private static final Integer MAX_TRAINING_EPISODES_WITHOUT_SAVE = 100000;
 
 	static final String NEURAL_NETWORK_PLAYER_CLASS = "org.jskat.ai.nn.AIPlayerNN";
 	static final String RANDOM_PLAYER_CLASS = "org.jskat.ai.rnd.AIPlayerRND";
@@ -199,9 +200,14 @@ public class NNTrainer extends JSkatThread {
 		// playerTypes.add(RANDOM_PLAYER_CLASS);
 		Set<List<String>> playerPermutations = createPlayerPermutations(playerTypes);
 
-		while (!stopTraining && totalGames < MAX_TRAINING_EPISODES) {
+		while (!stopTraining /* && totalGames < MAX_TRAINING_EPISODES */) {
 
 			if (totalGames > 0) {
+
+				if (totalGames % MAX_TRAINING_EPISODES_WITHOUT_SAVE == 0) {
+					jskat.saveNeuralNetworks(gameType);
+				}
+
 				if (opponentParticipations == 0) {
 					// for ramsch games
 					jskat.addTrainingResult(gameType, totalGames,
