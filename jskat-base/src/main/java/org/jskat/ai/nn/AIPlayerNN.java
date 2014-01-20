@@ -53,7 +53,7 @@ public class AIPlayerNN extends AbstractAIPlayer {
 
 	public final static Double IDEAL_WON = 1.0;
 	public final static Double IDEAL_LOST = 0.0;
-	public final static Double EPSILON = 0.1;
+	public final static Double EPSILON = 0.15;
 
 	private Logger log = LoggerFactory.getLogger(AIPlayerNN.class);
 

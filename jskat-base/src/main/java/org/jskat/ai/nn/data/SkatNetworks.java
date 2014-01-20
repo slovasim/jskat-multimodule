@@ -26,18 +26,15 @@ import org.jskat.ai.nn.util.EncogNetworkWrapper;
 import org.jskat.ai.nn.util.INeuralNetwork;
 import org.jskat.ai.nn.util.NetworkTopology;
 import org.jskat.util.GameType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Holds all neural networks for the NN player
+ * Holds all neural networks for the NN player.
  */
-public class SkatNetworks {
-	private static Logger log = LoggerFactory.getLogger(SkatNetworks.class);
+public final class SkatNetworks {
 
 	private static int INPUT_NEURONS = GenericNetworkInputGenerator
 			.getNeuronCountForAllStrategies();
-	private static int HIDDEN_NEURONS = 100;
+	private static int HIDDEN_NEURONS = 25;
 	private static int OUTPUT_NEURONS = 1;
 
 	private static final boolean USE_BIAS = true;
@@ -47,7 +44,7 @@ public class SkatNetworks {
 	private static Map<GameType, Map<PlayerParty, List<INeuralNetwork>>> networks;
 
 	/**
-	 * Constructor
+	 * Private constructor for singleton class.
 	 */
 	private SkatNetworks() {
 
@@ -56,7 +53,7 @@ public class SkatNetworks {
 	}
 
 	/**
-	 * Gets a neural network
+	 * Gets a neural network.
 	 * 
 	 * @param gameType
 	 *            Game type

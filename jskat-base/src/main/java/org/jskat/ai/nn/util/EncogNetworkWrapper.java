@@ -80,22 +80,11 @@ public class EncogNetworkWrapper implements INeuralNetwork {
 	public synchronized double adjustWeights(final double[] inputValues,
 			final double[] outputValues) {
 
-		// if (dataPairList.size() < MAX_SIZE) {
-		// dataPairList.add(new BasicMLDataPair(new BasicMLData(inputValues),
-		// new BasicMLData(outputValues)));
-		// currentIndex++;
-		// } else {
-		// currentIndex = (currentIndex + 1) % MAX_SIZE;
-		// dataPairList.set(currentIndex, new BasicMLDataPair(new BasicMLData(
-		// inputValues), new BasicMLData(outputValues)));
-		// }
 		List<MLDataPair> data = new ArrayList<MLDataPair>();
 		data.add(new BasicMLDataPair(new BasicMLData(inputValues),
 				new BasicMLData(outputValues)));
 		MLDataSet trainingSet = new BasicMLDataSet(data);
 
-		// BasicTraining trainer = new ResilientPropagation(network,
-		// trainingSet);
 		Backpropagation trainer = new Backpropagation(network, trainingSet);
 		trainer.setBatchSize(1);
 		trainer.iteration();
