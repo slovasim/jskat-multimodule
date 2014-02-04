@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AIPlayerNN extends AbstractAIPlayer {
 
-	private final static Long MAX_SIMULATIONS = 100L;
+	private final static Long MAX_SIMULATIONS = 25L;
 	private final static Double MIN_WON_RATE_FOR_BIDDING = 0.6;
 	private final static Double MIN_WON_RATE_FOR_HAND_GAME = 0.95;
 
@@ -178,7 +178,7 @@ public class AIPlayerNN extends AbstractAIPlayer {
 	public CardList getCardsToDiscard() {
 		CardList cards = knowledge.getOwnCards();
 		CardList result = new CardList();
-		Double highestWonRate = 0.0;
+		Double highestWonRate = Double.MIN_VALUE;
 
 		log.debug("Player cards before discarding: " + knowledge.getOwnCards()); //$NON-NLS-1$
 
@@ -198,7 +198,7 @@ public class AIPlayerNN extends AbstractAIPlayer {
 				simCards.removeAll(currSkat);
 
 				gameSimulator.resetGameSimulator(filteredGameTypes,
-						knowledge.getPlayerPosition(), simCards);
+						knowledge.getPlayerPosition(), simCards, currSkat);
 				SimulationResults simulationResults = gameSimulator
 						.simulateMaxEpisodes(MAX_SIMULATIONS);
 
@@ -214,15 +214,6 @@ public class AIPlayerNN extends AbstractAIPlayer {
 				}
 			}
 		}
-
-		if (result.size() != 2) {
-			log.error("Did not found cards for discarding!!!"); //$NON-NLS-1$
-			result.clear();
-			result.add(cards.remove(rand.nextInt(cards.size())));
-			result.add(cards.remove(rand.nextInt(cards.size())));
-		}
-
-		log.debug("Player cards after discarding: " + knowledge.getOwnCards()); //$NON-NLS-1$
 
 		return result;
 	}
