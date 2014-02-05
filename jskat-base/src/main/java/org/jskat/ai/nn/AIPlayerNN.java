@@ -55,18 +55,39 @@ public class AIPlayerNN extends AbstractAIPlayer {
 	public final static Double IDEAL_LOST = 0.0;
 	public final static Double EPSILON = 0.15;
 
+	// FIXME (jan 10.03.2012) code duplication with NNTrainer
+	private static boolean isRamschGameWon(final GameSummary gameSummary,
+			final Player currPlayer) {
+		boolean ramschGameWon = false;
+		int playerPoints = gameSummary.getPlayerPoints(currPlayer);
+		int highestPlayerPoints = 0;
+		for (Player player : Player.values()) {
+			int currPlayerPoints = gameSummary.getPlayerPoints(player);
+
+			if (currPlayerPoints > highestPlayerPoints) {
+				highestPlayerPoints = currPlayerPoints;
+			}
+		}
+
+		if (highestPlayerPoints > playerPoints) {
+			ramschGameWon = true;
+		}
+
+		return ramschGameWon;
+	}
+
 	private Logger log = LoggerFactory.getLogger(AIPlayerNN.class);
 
 	private DecimalFormat formatter = new DecimalFormat("0.00000000000000000"); //$NON-NLS-1$
-
 	private final GameSimulator gameSimulator;
-	private NetworkInputGenerator inputGenerator;
 
+	private NetworkInputGenerator inputGenerator;
 	private final Random rand;
 	private final List<double[]> allInputs = new ArrayList<double[]>();
-	private GameType bestGameTypeFromDiscarding;
 
+	private GameType bestGameTypeFromDiscarding;
 	private boolean isLearning = false;
+
 	private double lastAvgNetworkError = 0.0;
 
 	private final List<GameType> feasibleGameTypes = new ArrayList<GameType>();
@@ -98,6 +119,51 @@ public class AIPlayerNN extends AbstractAIPlayer {
 		}
 
 		rand = new Random();
+	}
+
+	private void adjustNeuralNetworks(final List<double[]> inputs) {
+		assert inputs.size() < 11;
+
+		double networkErrorSum = 0.0;
+		double output = 0.0d;
+		if (!GameType.PASSED_IN.equals(knowledge.getGameType())) {
+			if (GameType.RAMSCH.equals(knowledge.getGameType())) {
+				if (isRamschGameWon(gameSummary, knowledge.getPlayerPosition())) {
+					output = IDEAL_WON;
+				} else {
+					output = IDEAL_LOST;
+				}
+			} else {
+				if (isDeclarer()) {
+					if (gameSummary.isGameWon()) {
+						output = IDEAL_WON;
+					} else {
+						output = IDEAL_LOST;
+					}
+				} else {
+					if (gameSummary.isGameWon()) {
+						output = IDEAL_LOST;
+					} else {
+						output = IDEAL_WON;
+					}
+				}
+			}
+			double[] outputs = new double[] { output };
+
+			int index = 0;
+			for (double[] inputParam : inputs) {
+				INeuralNetwork net = SkatNetworks.getNetwork(knowledge
+						.getGameAnnouncement().getGameType(), isDeclarer(),
+						index);
+
+				double networkError = net.adjustWeights(inputParam, outputs);
+				log.warn("learning error: " + networkError);
+				networkErrorSum += networkError;
+				index++;
+			}
+
+			lastAvgNetworkError = networkErrorSum / inputs.size();
+		}
 	}
 
 	/**
@@ -157,6 +223,39 @@ public class AIPlayerNN extends AbstractAIPlayer {
 		return false;
 	}
 
+	private int chooseRandomCard(final CardList possibleCards,
+			final CardList goodCards) {
+		int bestCardIndex;
+		Card choosenCard = goodCards.get(rand.nextInt(goodCards.size()));
+		bestCardIndex = possibleCards.indexOf(choosenCard);
+		return bestCardIndex;
+	}
+
+	private List<GameType> filterFeasibleGameTypes(final int bidValue) {
+		// FIXME (jansch 14.09.2011) consider hand and ouvert games
+		// return game announcement instead
+		List<GameType> result = new ArrayList<GameType>();
+
+		SkatGameData data = getGameDataForWonGame();
+
+		for (GameType gameType : feasibleGameTypes) {
+
+			GameAnnouncementFactory factory = GameAnnouncement.getFactory();
+			factory.setGameType(gameType);
+			data.setAnnouncement(factory.getAnnouncement());
+
+			SkatRule skatRules = SkatRuleFactory.getSkatRules(gameType);
+			int currGameResult = skatRules.calcGameResult(data);
+
+			if (currGameResult >= bidValue) {
+
+				result.add(gameType);
+			}
+		}
+
+		return result;
+	}
+
 	/**
 	 * @see org.jskat.player.JSkatPlayer#finalizeGame()
 	 */
@@ -169,6 +268,41 @@ public class AIPlayerNN extends AbstractAIPlayer {
 			// from last trick to first trick
 			adjustNeuralNetworks(allInputs);
 		}
+	}
+
+	private GameType getBestGameType() {
+		// FIXME (jan 18.01.2011) check for overbidding!
+		GameType bestGameType = null;
+		double highestWonRate = 0.0;
+
+		List<GameType> gameTypesToCheck = filterFeasibleGameTypes(knowledge
+				.getHighestBid(knowledge.getPlayerPosition()));
+		gameSimulator.resetGameSimulator(gameTypesToCheck,
+				knowledge.getPlayerPosition(), knowledge.getOwnCards());
+		SimulationResults results = gameSimulator
+				.simulateMaxEpisodes(MAX_SIMULATIONS);
+
+		for (GameType gameType : gameTypesToCheck) {
+
+			Double wonRate = results.getWonRate(gameType);
+
+			if (wonRate.doubleValue() > highestWonRate) {
+
+				log.debug("Found new highest number of won games " //$NON-NLS-1$
+						+ wonRate + " for game type " + gameType); //$NON-NLS-1$
+
+				highestWonRate = wonRate;
+				bestGameType = gameType;
+			}
+		}
+
+		if (bestGameType == null) {
+			// FIXME (jansch 21.09.2011) find cheapest game
+			log.error("No best game type found. Announcing null!!!"); //$NON-NLS-1$
+			bestGameType = GameType.NULL;
+		}
+
+		return bestGameType;
 	}
 
 	/**
@@ -218,6 +352,30 @@ public class AIPlayerNN extends AbstractAIPlayer {
 		return result;
 	}
 
+	private SkatGameData getGameDataForWonGame() {
+		SkatGameData data = new SkatGameData();
+
+		// it doesn't matter which position is set for declarer
+		// skat game data are only used to calculate the game value
+		data.setDeclarer(Player.FOREHAND);
+		data.addDealtCards(Player.FOREHAND, knowledge.getOwnCards());
+		data.addSkatToPlayer(Player.FOREHAND);
+
+		SkatGameResult result = new SkatGameResult();
+		result.setWon(true);
+		data.setResult(result);
+
+		return data;
+	}
+
+	private String getInputString(final double[] inputs) {
+		String result = "";
+		for (double input : inputs) {
+			result += input + " ";
+		}
+		return result;
+	}
+
 	/**
 	 * Gets the last average network error
 	 * 
@@ -233,6 +391,22 @@ public class AIPlayerNN extends AbstractAIPlayer {
 	@Override
 	public Boolean holdBid(final int currBidValue) {
 		return isAnyGamePossible(currBidValue);
+	}
+
+	private boolean isAnyGamePossible(final int bidValue) {
+		List<GameType> filteredGameTypes = filterFeasibleGameTypes(bidValue);
+
+		gameSimulator.resetGameSimulator(filteredGameTypes,
+				knowledge.getPlayerPosition(), knowledge.getOwnCards());
+		SimulationResults results = gameSimulator
+				.simulateMaxEpisodes(MAX_SIMULATIONS);
+
+		for (Double wonRate : results.getAllWonRates()) {
+			if (wonRate.doubleValue() > MIN_WON_RATE_FOR_BIDDING) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -370,181 +544,7 @@ public class AIPlayerNN extends AbstractAIPlayer {
 		// CHECK Auto-generated method stub
 	}
 
-	private void adjustNeuralNetworks(final List<double[]> inputs) {
-		assert inputs.size() < 11;
-
-		double networkErrorSum = 0.0;
-		double output = 0.0d;
-		if (!GameType.PASSED_IN.equals(knowledge.getGameType())) {
-			if (GameType.RAMSCH.equals(knowledge.getGameType())) {
-				if (isRamschGameWon(gameSummary, knowledge.getPlayerPosition())) {
-					output = IDEAL_WON;
-				} else {
-					output = IDEAL_LOST;
-				}
-			} else {
-				if (isDeclarer()) {
-					if (gameSummary.isGameWon()) {
-						output = IDEAL_WON;
-					} else {
-						output = IDEAL_LOST;
-					}
-				} else {
-					if (gameSummary.isGameWon()) {
-						output = IDEAL_LOST;
-					} else {
-						output = IDEAL_WON;
-					}
-				}
-			}
-			double[] outputs = new double[] { output };
-
-			int index = 0;
-			for (double[] inputParam : inputs) {
-				INeuralNetwork net = SkatNetworks.getNetwork(knowledge
-						.getGameAnnouncement().getGameType(), isDeclarer(),
-						index);
-
-				double networkError = net.adjustWeights(inputParam, outputs);
-				log.warn("learning error: " + networkError);
-				networkErrorSum += networkError;
-				index++;
-			}
-
-			lastAvgNetworkError = networkErrorSum / inputs.size();
-		}
-	}
-
-	private int chooseRandomCard(final CardList possibleCards,
-			final CardList goodCards) {
-		int bestCardIndex;
-		Card choosenCard = goodCards.get(rand.nextInt(goodCards.size()));
-		bestCardIndex = possibleCards.indexOf(choosenCard);
-		return bestCardIndex;
-	}
-
-	private List<GameType> filterFeasibleGameTypes(final int bidValue) {
-		// FIXME (jansch 14.09.2011) consider hand and ouvert games
-		// return game announcement instead
-		List<GameType> result = new ArrayList<GameType>();
-
-		SkatGameData data = getGameDataForWonGame();
-
-		for (GameType gameType : feasibleGameTypes) {
-
-			GameAnnouncementFactory factory = GameAnnouncement.getFactory();
-			factory.setGameType(gameType);
-			data.setAnnouncement(factory.getAnnouncement());
-
-			SkatRule skatRules = SkatRuleFactory.getSkatRules(gameType);
-			int currGameResult = skatRules.calcGameResult(data);
-
-			if (currGameResult >= bidValue) {
-
-				result.add(gameType);
-			}
-		}
-
-		return result;
-	}
-
-	private GameType getBestGameType() {
-		// FIXME (jan 18.01.2011) check for overbidding!
-		GameType bestGameType = null;
-		double highestWonRate = 0.0;
-
-		List<GameType> gameTypesToCheck = filterFeasibleGameTypes(knowledge
-				.getHighestBid(knowledge.getPlayerPosition()));
-		gameSimulator.resetGameSimulator(gameTypesToCheck,
-				knowledge.getPlayerPosition(), knowledge.getOwnCards());
-		SimulationResults results = gameSimulator
-				.simulateMaxEpisodes(MAX_SIMULATIONS);
-
-		for (GameType gameType : gameTypesToCheck) {
-
-			Double wonRate = results.getWonRate(gameType);
-
-			if (wonRate.doubleValue() > highestWonRate) {
-
-				log.debug("Found new highest number of won games " //$NON-NLS-1$
-						+ wonRate + " for game type " + gameType); //$NON-NLS-1$
-
-				highestWonRate = wonRate;
-				bestGameType = gameType;
-			}
-		}
-
-		if (bestGameType == null) {
-			// FIXME (jansch 21.09.2011) find cheapest game
-			log.error("No best game type found. Announcing null!!!"); //$NON-NLS-1$
-			bestGameType = GameType.NULL;
-		}
-
-		return bestGameType;
-	}
-
-	private SkatGameData getGameDataForWonGame() {
-		SkatGameData data = new SkatGameData();
-
-		// it doesn't matter which position is set for declarer
-		// skat game data are only used to calculate the game value
-		data.setDeclarer(Player.FOREHAND);
-		data.addDealtCards(Player.FOREHAND, knowledge.getOwnCards());
-		data.addSkatToPlayer(Player.FOREHAND);
-
-		SkatGameResult result = new SkatGameResult();
-		result.setWon(true);
-		data.setResult(result);
-
-		return data;
-	}
-
-	private String getInputString(final double[] inputs) {
-		String result = "";
-		for (double input : inputs) {
-			result += input + " ";
-		}
-		return result;
-	}
-
-	private boolean isAnyGamePossible(final int bidValue) {
-		List<GameType> filteredGameTypes = filterFeasibleGameTypes(bidValue);
-
-		gameSimulator.resetGameSimulator(filteredGameTypes,
-				knowledge.getPlayerPosition(), knowledge.getOwnCards());
-		SimulationResults results = gameSimulator
-				.simulateMaxEpisodes(MAX_SIMULATIONS);
-
-		for (Double wonRate : results.getAllWonRates()) {
-			if (wonRate.doubleValue() > MIN_WON_RATE_FOR_BIDDING) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private void storeInputParameters(final double[] inputParameters) {
 		allInputs.add(inputParameters);
-	}
-
-	// FIXME (jan 10.03.2012) code duplication with NNTrainer
-	private static boolean isRamschGameWon(final GameSummary gameSummary,
-			final Player currPlayer) {
-		boolean ramschGameWon = false;
-		int playerPoints = gameSummary.getPlayerPoints(currPlayer);
-		int highestPlayerPoints = 0;
-		for (Player player : Player.values()) {
-			int currPlayerPoints = gameSummary.getPlayerPoints(player);
-
-			if (currPlayerPoints > highestPlayerPoints) {
-				highestPlayerPoints = currPlayerPoints;
-			}
-		}
-
-		if (highestPlayerPoints > playerPoints) {
-			ramschGameWon = true;
-		}
-
-		return ramschGameWon;
 	}
 }
