@@ -29,7 +29,7 @@ public abstract class AbstractCardInputStrategy extends AbstractInputStrategy {
 	 *            Card
 	 * @return Index of card in network input
 	 */
-	protected static int getNetworkInputIndex(final Card card) {
+	protected final static int getNetworkInputIndex(final Card card) {
 
 		return card.getSuit().getSuitOrder() * 8 + card.getNullOrder();
 	}

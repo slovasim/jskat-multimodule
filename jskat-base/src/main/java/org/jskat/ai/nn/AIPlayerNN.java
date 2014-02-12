@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AIPlayerNN extends AbstractAIPlayer {
 
-	private final static Long MAX_SIMULATIONS = 25L;
+	private final static Long MAX_SIMULATIONS = 10L;
 	private final static Double MIN_WON_RATE_FOR_BIDDING = 0.6;
 	private final static Double MIN_WON_RATE_FOR_HAND_GAME = 0.95;
 

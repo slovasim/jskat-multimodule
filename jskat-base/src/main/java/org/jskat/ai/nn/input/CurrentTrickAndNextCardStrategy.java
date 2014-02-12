@@ -24,12 +24,14 @@ import org.jskat.util.rule.SkatRuleFactory;
 public class CurrentTrickAndNextCardStrategy extends CurrentTrickStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = getEmptyInputs();
 
 		Trick trick = (Trick) knowledge.getCurrentTrick().clone();
 
+		// TODO: this looks wrong, why changing the fore hand input?
 		if (trick.getFirstCard() != null && trick.getSecondCard() != null
 				&& trick.getThirdCard() == null) {
 			// trick will be completed by next card
