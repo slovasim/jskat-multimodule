@@ -474,6 +474,13 @@ public class JSkatMaster {
 	/**
 	 * Saves the weigths for the neural networks
 	 */
+	public void saveNeuralNetworks(GameType gameType) {
+		SkatNetworks.instance().saveNetworks(options.getSavePath(), gameType);
+	}
+
+	/**
+	 * Saves the weigths for the neural networks
+	 */
 	public void saveNeuralNetworks() {
 		SkatNetworks.instance().saveNetworks(options.getSavePath());
 	}
