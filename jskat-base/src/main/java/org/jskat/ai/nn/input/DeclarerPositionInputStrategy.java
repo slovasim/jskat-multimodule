@@ -25,11 +25,6 @@ public class DeclarerPositionInputStrategy extends
 		AbstractPositionInputStrategy {
 
 	@Override
-	public int getNeuronCount() {
-		return 3;
-	}
-
-	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
 			Card cardToPlay) {
 

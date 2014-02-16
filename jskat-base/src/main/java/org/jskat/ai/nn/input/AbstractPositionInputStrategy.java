@@ -20,6 +20,11 @@ import org.jskat.util.Player;
 public abstract class AbstractPositionInputStrategy extends
 		AbstractInputStrategy {
 
+	@Override
+	public final int getNeuronCount() {
+		return 3;
+	}
+
 	protected final void setPositionInput(double[] result, Player position) {
 		switch (position) {
 		case FOREHAND:

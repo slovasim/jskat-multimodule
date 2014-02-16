@@ -24,11 +24,6 @@ import org.jskat.util.Card;
 public class PlayerPositionInputStrategy extends AbstractPositionInputStrategy {
 
 	@Override
-	public int getNeuronCount() {
-		return 3;
-	}
-
-	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
 			Card cardToPlay) {
 

@@ -19,7 +19,12 @@ import org.jskat.data.Trick;
 import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
 
-public class CurrentTrickStrategy extends AbstractCardInputStrategy {
+public class CurrentTrickStrategy extends AbstractInputStrategy {
+
+	@Override
+	public int getNeuronCount() {
+		return 3 * 32;
+	}
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
@@ -31,15 +36,21 @@ public class CurrentTrickStrategy extends AbstractCardInputStrategy {
 
 		// set already played cards
 		if (trick.getFirstCard() != null) {
-			result[3 + getNetworkInputIndex(trick.getFirstCard())] = ON;
+			result[getNetworkInputIndex(trick.getFirstCard())] = 1.0;
 		}
 		if (trick.getSecondCard() != null) {
-			result[3 + 32 + getNetworkInputIndex(trick.getSecondCard())] = ON;
+			result[32 + getNetworkInputIndex(trick.getSecondCard())] = 1.0;
 		}
 		if (trick.getThirdCard() != null) {
-			result[3 + 64 + getNetworkInputIndex(trick.getThirdCard())] = ON;
+			result[64 + getNetworkInputIndex(trick.getThirdCard())] = 1.0;
 		}
 
 		return result;
 	}
+
+	protected static int getNetworkInputIndex(final Card card) {
+
+		return card.getSuit().getSuitOrder() * 8 + card.getNullOrder();
+	}
+
 }

@@ -26,7 +26,7 @@ public class NextCardStrategy extends AbstractCardInputStrategy {
 
 		double[] result = getEmptyInputs();
 
-		result[getNetworkInputIndex(cardToPlay)] = 1.0;
+		result[getNetworkInputIndex(cardToPlay)] = ON;
 
 		return result;
 	}

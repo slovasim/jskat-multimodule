@@ -25,8 +25,7 @@ import org.jskat.util.Card;
 public class TrickCardAndNextCardInputStrategy extends TrickCardInputStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
-			Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
 
 		double[] result = super.getNetworkInput(knowledge, cardToPlay);
 
@@ -34,13 +33,13 @@ public class TrickCardAndNextCardInputStrategy extends TrickCardInputStrategy {
 
 		// set next card to play
 		if (trick.getFirstCard() == null) {
-			result[getTrickOffset(trick) + 3 + getNetworkInputIndex(cardToPlay)] = ON;
+			result[getTrickOffset(trick) + 3 + getNetworkInputIndex(cardToPlay)] = 1.0;
 		} else if (trick.getSecondCard() == null) {
 			result[getTrickOffset(trick) + 3 + 32
-					+ getNetworkInputIndex(cardToPlay)] = ON;
+					+ getNetworkInputIndex(cardToPlay)] = 1.0;
 		} else if (trick.getThirdCard() == null) {
 			result[getTrickOffset(trick) + 3 + 64
-					+ getNetworkInputIndex(cardToPlay)] = ON;
+					+ getNetworkInputIndex(cardToPlay)] = 1.0;
 		}
 
 		return result;

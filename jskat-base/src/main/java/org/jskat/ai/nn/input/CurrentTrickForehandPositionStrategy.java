@@ -19,13 +19,8 @@ import org.jskat.data.Trick;
 import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
 
-public class CurrentTrickPlayerPositionStrategy extends
+public class CurrentTrickForehandPositionStrategy extends
 		AbstractPositionInputStrategy {
-
-	@Override
-	public int getNeuronCount() {
-		return 3;
-	}
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
