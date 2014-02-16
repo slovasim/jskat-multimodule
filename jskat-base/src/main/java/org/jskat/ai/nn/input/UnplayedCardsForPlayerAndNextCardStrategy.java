@@ -19,11 +19,11 @@ import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
 
 /**
- * Gets the network inputs for unplayed cards in the game and the next card to
- * be played
+ * Gets network inputs for unplayed cards by the player and the next card to be
+ * played
  */
-public class UnplayedCardsAndNextCardInputStrategy extends
-		UnplayedCardsInputStrategy {
+public class UnplayedCardsForPlayerAndNextCardStrategy extends
+		UnplayedCardsForPlayerStrategy {
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {

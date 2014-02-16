@@ -21,7 +21,7 @@ import org.jskat.util.Card;
 /**
  * Gets network inputs for unplayed cards by the player
  */
-public class UnplayedCardsForPlayerInputStrategy extends
+public class UnplayedCardsForPlayerStrategy extends
 		AbstractCardInputStrategy {
 
 	@Override

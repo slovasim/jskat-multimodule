@@ -30,7 +30,8 @@ public class CurrentTrickStrategy extends AbstractInputStrategy implements
 	}
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 		double[] result = getEmptyInputs();
 
 		Trick trick = knowledge.getCurrentTrick();

@@ -21,7 +21,7 @@ import org.jskat.util.Card;
 /**
  * Gets the network inputs for unplayed cards in the game
  */
-public class UnplayedCardsInputStrategy extends AbstractCardInputStrategy {
+public class UnplayedCardsStrategy extends AbstractCardInputStrategy {
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
