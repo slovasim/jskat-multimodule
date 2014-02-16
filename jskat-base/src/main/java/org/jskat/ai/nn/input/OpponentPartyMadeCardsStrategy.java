@@ -23,8 +23,7 @@ import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
 import org.jskat.util.Player;
 
-public class OpponentPartyMadeCardsStrategy extends AbstractCardInputStrategy
-		implements InputStrategy {
+public class OpponentPartyMadeCardsStrategy extends AbstractCardInputStrategy {
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
@@ -38,7 +37,7 @@ public class OpponentPartyMadeCardsStrategy extends AbstractCardInputStrategy
 			if (!partyMembers.contains(trick.getTrickWinner())) {
 				// trick was won by opponent's party
 				for (Card card : trick.getCardList()) {
-					result[getNetworkInputIndex(card)] = 1.0;
+					result[getNetworkInputIndex(card)] = ON;
 				}
 			}
 		}

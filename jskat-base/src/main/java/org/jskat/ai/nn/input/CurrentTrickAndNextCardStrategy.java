@@ -29,20 +29,17 @@ public class CurrentTrickAndNextCardStrategy extends CurrentTrickStrategy {
 
 		Trick trick = (Trick) knowledge.getCurrentTrick().clone();
 
-		// set trick forehand position
-		result[getTrickForehand(trick.getForeHand())] = 1.0;
-
 		trick.addCard(cardToPlay);
 
 		// set already played cards
 		if (trick.getFirstCard() != null) {
-			result[3 + getNetworkInputIndex(trick.getFirstCard())] = 1.0;
+			result[3 + getNetworkInputIndex(trick.getFirstCard())] = ON;
 		}
 		if (trick.getSecondCard() != null) {
-			result[3 + 32 + getNetworkInputIndex(trick.getSecondCard())] = 1.0;
+			result[3 + 32 + getNetworkInputIndex(trick.getSecondCard())] = ON;
 		}
 		if (trick.getThirdCard() != null) {
-			result[3 + 64 + getNetworkInputIndex(trick.getThirdCard())] = 1.0;
+			result[3 + 64 + getNetworkInputIndex(trick.getThirdCard())] = ON;
 		}
 
 		return result;

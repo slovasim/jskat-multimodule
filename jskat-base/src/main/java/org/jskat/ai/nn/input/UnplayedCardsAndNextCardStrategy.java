@@ -22,15 +22,15 @@ import org.jskat.util.Card;
  * Gets the network inputs for unplayed cards in the game and the next card to
  * be played
  */
-public class UnplayedCardsAndNextCardStrategy extends
-		UnplayedCardsStrategy {
+public class UnplayedCardsAndNextCardStrategy extends UnplayedCardsStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = super.getNetworkInput(knowledge, cardToPlay);
 
-		result[getNetworkInputIndex(cardToPlay)] = 0.0;
+		result[getNetworkInputIndex(cardToPlay)] = ON;
 
 		return result;
 	}

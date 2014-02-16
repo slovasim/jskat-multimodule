@@ -26,11 +26,12 @@ public class UnplayedCardsForPlayerAndNextCardStrategy extends
 		UnplayedCardsForPlayerStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = super.getNetworkInput(knowledge, cardToPlay);
 
-		result[getNetworkInputIndex(cardToPlay)] = 0.0;
+		result[getNetworkInputIndex(cardToPlay)] = ON;
 
 		return result;
 	}

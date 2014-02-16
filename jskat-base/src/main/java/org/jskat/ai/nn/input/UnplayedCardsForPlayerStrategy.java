@@ -21,17 +21,17 @@ import org.jskat.util.Card;
 /**
  * Gets network inputs for unplayed cards by the player
  */
-public class UnplayedCardsForPlayerStrategy extends
-		AbstractCardInputStrategy {
+public class UnplayedCardsForPlayerStrategy extends AbstractCardInputStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = getEmptyInputs();
 
 		for (Card card : Card.values()) {
 			if (knowledge.isOwnCard(card)) {
-				result[getNetworkInputIndex(card)] = 1.0;
+				result[getNetworkInputIndex(card)] = ON;
 			}
 		}
 

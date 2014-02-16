@@ -28,7 +28,8 @@ public class PlayerPartyMadeCardsAndNextCardStrategy extends
 		PlayerPartyMadeCardsStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = super.getNetworkInput(knowledge, cardToPlay);
 
@@ -47,7 +48,7 @@ public class PlayerPartyMadeCardsAndNextCardStrategy extends
 					knowledge.getGameType(), trick))) {
 				// trick was won by player's party
 				for (Card card : trick.getCardList()) {
-					result[getNetworkInputIndex(card)] = 1.0;
+					result[getNetworkInputIndex(card)] = ON;
 				}
 			}
 		}

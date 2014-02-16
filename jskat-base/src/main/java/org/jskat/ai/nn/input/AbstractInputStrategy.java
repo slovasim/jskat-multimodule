@@ -17,6 +17,8 @@ package org.jskat.ai.nn.input;
 
 public abstract class AbstractInputStrategy implements InputStrategy {
 
+	protected final static double ON = 1.0d;
+
 	protected double[] getEmptyInputs() {
 		return new double[getNeuronCount()];
 	}

@@ -25,13 +25,14 @@ public class PlayedCardsForPlayerInputStrategy extends
 		AbstractCardInputStrategy {
 
 	@Override
-	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge, Card cardToPlay) {
+	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
+			Card cardToPlay) {
 
 		double[] result = getEmptyInputs();
 
 		for (Card card : Card.values()) {
 			if (knowledge.isCardPlayedBy(knowledge.getPlayerPosition(), card)) {
-				result[getNetworkInputIndex(card)] = 1.0;
+				result[getNetworkInputIndex(card)] = ON;
 			}
 		}
 		return result;
