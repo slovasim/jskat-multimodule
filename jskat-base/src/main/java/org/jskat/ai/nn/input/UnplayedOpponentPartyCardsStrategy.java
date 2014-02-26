@@ -17,22 +17,25 @@ package org.jskat.ai.nn.input;
 
 import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
+import org.jskat.util.Player;
 
-/**
- * Gets network inputs for unplayed cards by the player and the next card to be
- * played
- */
-public class UnplayedCardsForPlayerAndNextCardStrategy extends
-		UnplayedCardsForPlayerStrategy {
+public class UnplayedOpponentPartyCardsStrategy extends
+		AbstractCardInputStrategy implements InputStrategy {
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
 			Card cardToPlay) {
 
-		double[] result = super.getNetworkInput(knowledge, cardToPlay);
+		double[] result = getEmptyInputs();
 
-		result[getNetworkInputIndex(cardToPlay)] = ON;
-
+		Player position = knowledge.getPlayerPosition();
+		for (Card card : Card.values()) {
+			if (knowledge.couldHaveCard(position.getLeftNeighbor(), card)
+					|| knowledge.couldHaveCard(position.getRightNeighbor(),
+							card)) {
+				result[getNetworkInputIndex(card)] = ON;
+			}
+		}
 		return result;
 	}
 }

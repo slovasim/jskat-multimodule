@@ -15,16 +15,13 @@
  */
 package org.jskat.ai.nn.input;
 
-import org.jskat.data.Trick;
 import org.jskat.player.ImmutablePlayerKnowledge;
 import org.jskat.util.Card;
 
-public class CurrentTrickStrategy extends AbstractInputStrategy {
-
-	@Override
-	public int getNeuronCount() {
-		return 3 * 32;
-	}
+/**
+ * Gets network inputs for unplayed cards by the player
+ */
+public class UnplayedPlayerCardsStrategy extends AbstractCardInputStrategy {
 
 	@Override
 	public double[] getNetworkInput(ImmutablePlayerKnowledge knowledge,
@@ -32,17 +29,10 @@ public class CurrentTrickStrategy extends AbstractInputStrategy {
 
 		double[] result = getEmptyInputs();
 
-		Trick trick = knowledge.getCurrentTrick();
-
-		// set already played cards
-		if (trick.getFirstCard() != null) {
-			result[getNetworkInputIndex(trick.getFirstCard())] = ON;
-		}
-		if (trick.getSecondCard() != null) {
-			result[32 + getNetworkInputIndex(trick.getSecondCard())] = ON;
-		}
-		if (trick.getThirdCard() != null) {
-			result[64 + getNetworkInputIndex(trick.getThirdCard())] = ON;
+		for (Card card : Card.values()) {
+			if (knowledge.isOwnCard(card)) {
+				result[getNetworkInputIndex(card)] = ON;
+			}
 		}
 
 		return result;

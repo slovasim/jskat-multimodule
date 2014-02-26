@@ -437,8 +437,7 @@ public class ImmutablePlayerKnowledge {
 	}
 
 	/**
-	 * Checks whether a player has a card by ruling out all other options, this
-	 * might be an uncertain information
+	 * Checks whether a player has a card by ruling out all other options.
 	 * 
 	 * @param player
 	 *            Player ID

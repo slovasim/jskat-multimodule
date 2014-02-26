@@ -15,11 +15,18 @@
  */
 package org.jskat.ai.nn.input;
 
+import org.jskat.util.Card;
+
 public abstract class AbstractInputStrategy implements InputStrategy {
 
 	protected final static double ON = 1.0d;
 
-	protected double[] getEmptyInputs() {
+	protected final double[] getEmptyInputs() {
 		return new double[getNeuronCount()];
+	}
+
+	protected static int getNetworkInputIndex(final Card card) {
+
+		return card.getSuit().getSuitOrder() * 8 + card.getNullOrder();
 	}
 }
