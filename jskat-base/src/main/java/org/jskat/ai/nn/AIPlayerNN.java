@@ -315,11 +315,15 @@ public class AIPlayerNN extends AbstractAIPlayer {
 			if (currOutput > (IDEAL_WON - EPSILON)) {
 				bestCards.add(card);
 			}
-			if (currOutput > highestOutput) {
+			if (currOutput > highestOutput
+					&& !formatter.format(currOutput).equals(
+							formatter.format(highestOutput))) {
 				highestOutput = currOutput;
 				highestOutputCards.clear();
 				highestOutputCards.add(card);
-			} else if (currOutput == highestOutput) {
+			} else if (currOutput == highestOutput
+					|| formatter.format(currOutput).equals(
+							formatter.format(highestOutput))) {
 				highestOutputCards.add(card);
 			}
 		}
@@ -331,7 +335,7 @@ public class AIPlayerNN extends AbstractAIPlayer {
 		} else {
 			// no best card, get card with best output
 			bestCardIndex = chooseRandomCard(possibleCards, highestOutputCards);
-			log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": Found no best cards. Choosing card with highest output: " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$ 
+			log.warn("Trick " + (knowledge.getNoOfTricks() + 1) + ": Found no best cards. Choosing card from " + highestOutputCards.size() + " out of " + possibleCards.size() + " with highest output: " + possibleCards.get(bestCardIndex)); //$NON-NLS-1$ //$NON-NLS-2$ 
 			// no best card, get random card out of all cards
 			// bestCardIndex = chooseRandomCard(possibleCards, possibleCards);
 		}
