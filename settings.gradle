@@ -1,0 +1,2 @@
+include 'jskat-base'
+include 'jskat-swing-gui'
